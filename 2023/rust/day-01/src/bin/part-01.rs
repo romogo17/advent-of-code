@@ -1,5 +1,5 @@
 fn main() {
-    let input = include_str!("../../inputs/part-01-input-01.txt");
+    let input = include_str!("../../inputs/input-01.txt");
     let output = process(input);
     println!("Output is {output}");
 }
@@ -33,7 +33,7 @@ treb7uchet",
 
     #[test]
     fn part_01_input_01() {
-        let output = process(include_str!("../../inputs/part-01-input-01.txt"));
+        let output = process(include_str!("../../inputs/input-01.txt"));
         assert_eq!(output, 53651);
     }
 }
