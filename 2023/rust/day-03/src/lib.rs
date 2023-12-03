@@ -35,10 +35,7 @@ impl EngineSchematic {
 
         engine_schematic
             .into_iter()
-            .filter(|num_in_engine| {
-                println!("Checking {}", num_in_engine.value);
-                self.is_part_number(num_in_engine)
-            })
+            .filter(|num_in_engine| self.is_part_number(num_in_engine))
             .collect()
     }
 
