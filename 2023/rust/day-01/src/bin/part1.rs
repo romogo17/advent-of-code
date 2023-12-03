@@ -17,11 +17,11 @@ fn process_line(line: &str) -> u32 {
 }
 
 #[cfg(test)]
-mod tests {
+mod day_01_part1 {
     use super::*;
 
     #[test]
-    fn part1_example() {
+    fn example() {
         let output = process(
             "1abc2
 pqr3stu8vwx
@@ -32,7 +32,7 @@ treb7uchet",
     }
 
     #[test]
-    fn part1_input1() {
+    fn input1() {
         let output = process(include_str!("../../inputs/input1.txt"));
         assert_eq!(output, 53651);
     }

@@ -42,11 +42,11 @@ fn extract_digits(line: &str) -> Vec<u32> {
 }
 
 #[cfg(test)]
-mod tests {
+mod day_01_part2 {
     use super::*;
 
     #[test]
-    fn part2_example() {
+    fn example() {
         let output = process(
             "two1nine
 eightwothree
@@ -60,7 +60,7 @@ zoneight234
     }
 
     #[test]
-    fn part2_input1() {
+    fn input1() {
         let output = process(include_str!("../../inputs/input1.txt"));
         assert_eq!(output, 53894);
     }

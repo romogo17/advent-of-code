@@ -36,7 +36,7 @@ impl CubeSet {
         }
     }
 
-    fn default() -> CubeSet {
+    pub fn default() -> CubeSet {
         CubeSet {
             cube_counts: vec![
                 CubeCount::new(CubeColor::Red, 0),
@@ -85,6 +85,26 @@ impl CubeSet {
                 (cube_count.count, other_count.count)
             })
             .all(|(self_count, other_count)| self_count <= other_count)
+    }
+
+    pub fn update_with_max(&mut self, other: &CubeSet) -> () {
+        for cube_count in self.cube_counts.iter_mut() {
+            let other_count = other
+                .cube_counts
+                .iter()
+                .find(|other_cube_count| other_cube_count.color == cube_count.color)
+                .unwrap();
+
+            if other_count.count > cube_count.count {
+                cube_count.count = other_count.count;
+            }
+        }
+    }
+
+    pub fn power(&self) -> u32 {
+        self.cube_counts
+            .iter()
+            .fold(1, |acc, cube_count| acc * cube_count.count)
     }
 }
 

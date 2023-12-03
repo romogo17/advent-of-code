@@ -8,31 +8,27 @@ fn main() {
         .map(|game_str| Game::new_from_aoc_input(game_str))
         .collect::<Vec<Game>>();
 
-    let total_cubes = CubeSet::new_from_rgb(12, 13, 14);
-
-    let output = process(games, total_cubes);
+    let output = process(games);
     println!("Output is {output}");
 }
 
-fn process(games: Vec<Game>, total_cubes: CubeSet) -> u32 {
+fn process(games: Vec<Game>) -> u32 {
     games
         .iter()
         .map(|game| {
-            match game
-                .cube_sets
-                .iter()
-                .map(|cube_set| cube_set.can_be_created_from(&total_cubes))
-                .all(|bool_res| bool_res == true)
-            {
-                true => game.id,
-                false => 0,
+            let mut min_cube_set = CubeSet::default();
+
+            for cube_set in game.cube_sets.iter() {
+                min_cube_set.update_with_max(cube_set);
             }
+
+            min_cube_set.power()
         })
         .sum()
 }
 
 #[cfg(test)]
-mod day_02_part1 {
+mod day_02_part2 {
     use super::*;
 
     #[test]
@@ -48,11 +44,9 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
             .map(|game_str| Game::new_from_aoc_input(game_str))
             .collect::<Vec<Game>>();
 
-        let total_cubes = CubeSet::new_from_rgb(12, 13, 14);
+        let output = process(games);
 
-        let output = process(games, total_cubes);
-
-        assert_eq!(output, 8);
+        assert_eq!(output, 2286);
     }
 
     #[test]
@@ -64,10 +58,8 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
             .map(|game_str| Game::new_from_aoc_input(game_str))
             .collect::<Vec<Game>>();
 
-        let total_cubes = CubeSet::new_from_rgb(12, 13, 14);
+        let output = process(games);
 
-        let output = process(games, total_cubes);
-
-        assert_eq!(output, 2720);
+        assert_eq!(output, 71535);
     }
 }
