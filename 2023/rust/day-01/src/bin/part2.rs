@@ -1,5 +1,5 @@
 fn main() {
-    let input = include_str!("../../inputs/input-01.txt");
+    let input = include_str!("../../inputs/input1.txt");
     let output = process(input);
     println!("Output is {output}");
 }
@@ -46,7 +46,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn part_02_example() {
+    fn part2_example() {
         let output = process(
             "two1nine
 eightwothree
@@ -60,8 +60,8 @@ zoneight234
     }
 
     #[test]
-    fn part_02_input_01() {
-        let output = process(include_str!("../../inputs/input-01.txt"));
+    fn part2_input1() {
+        let output = process(include_str!("../../inputs/input1.txt"));
         assert_eq!(output, 53894);
     }
 }
