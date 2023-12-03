@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 #[derive(Debug, Clone)]
 pub struct EngineSchematic {
     data: Vec<char>,
@@ -39,6 +41,41 @@ impl EngineSchematic {
             .collect()
     }
 
+    pub fn gears(&self) -> HashMap<(i32, i32), Vec<NumInEngine>> {
+        let part_numbers = self.part_numbers();
+
+        let mut gears: HashMap<(i32, i32), Vec<NumInEngine>> = HashMap::new();
+
+        for num_in_engine in part_numbers {
+            let col_idx =
+                num_in_engine.col as i32..num_in_engine.col as i32 + num_in_engine.len as i32;
+
+            for i in (num_in_engine.row as i32 - 1)..=(num_in_engine.row as i32 + 1) {
+                for j in (num_in_engine.col as i32 - 1)
+                    ..(num_in_engine.col as i32 + num_in_engine.len as i32 + 1)
+                {
+                    if !(i == num_in_engine.row as i32 && col_idx.contains(&j))
+                        && (0 <= i && i < self.rows as i32)
+                        && (0 <= j && j < self.cols as i32)
+                    {
+                        let idx = i * self.cols as i32 + j;
+                        let current_char = self.data[idx as usize];
+
+                        if current_char == '*' {
+                            gears
+                                .entry((i, j))
+                                .or_insert(Vec::new())
+                                .push(num_in_engine.clone());
+                        }
+                    }
+                }
+            }
+        }
+
+        gears.retain(|_, v| v.len() == 2);
+        gears
+    }
+
     fn is_part_number(&self, num_in_engine: &NumInEngine) -> bool {
         let mut flag = false;
         let col_idx = num_in_engine.col as i32..num_in_engine.col as i32 + num_in_engine.len as i32;
@@ -77,7 +114,7 @@ impl std::fmt::Display for EngineSchematic {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NumInEngine {
     pub value: u32,
     pub row: usize,

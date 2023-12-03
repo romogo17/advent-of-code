@@ -11,9 +11,9 @@ fn process(input: &str) -> u32 {
     println!("Engine schematic is \n{}", engine_schematic);
 
     engine_schematic
-        .part_numbers()
+        .gears()
         .iter()
-        .map(|num_in_engine| num_in_engine.value)
+        .map(|(_, v)| v.iter().fold(1, |acc, x| acc * x.value))
         .sum()
 }
 
@@ -34,13 +34,13 @@ mod day_03_part1 {
 ...$.*....
 .664.598..";
         let output = process(input);
-        assert_eq!(output, 4361);
+        assert_eq!(output, 467835);
     }
 
     #[test]
     fn input1() {
         let input = include_str!("../../inputs/input1.txt");
         let output = process(input);
-        assert_eq!(output, 550064);
+        assert_eq!(output, 85010461);
     }
 }
