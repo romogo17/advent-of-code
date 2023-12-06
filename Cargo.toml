@@ -4,3 +4,7 @@ members = ["*/rust/day-*"]
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
+
+[workspace.dependencies]
+indicatif = { version = "0.17.7", features = ["rayon"] }
+rayon = "1.8.0"

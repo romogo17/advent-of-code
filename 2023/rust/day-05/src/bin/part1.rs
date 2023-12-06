@@ -9,19 +9,24 @@ fn main() {
 fn process(input: &str) -> u64 {
     let almanac = Almanac::new_from_aoc_input(input);
 
-    almanac.seeds.iter().map(|seed|{
-        let soil = almanac.seed_to_soil(*seed);
-        let fertilizer = almanac.soil_to_fertilizer(soil);
-        let water = almanac.fertilizer_to_water(fertilizer);
-        let light = almanac.water_to_light(water);
-        let temperature = almanac.light_to_temperature(light);
-        let humidity = almanac.temperature_to_humidity(temperature);
-        let location = almanac.humidity_to_location(humidity);
+    almanac
+        .seeds
+        .iter()
+        .map(|seed| {
+            let soil = almanac.seed_to_soil(*seed);
+            let fertilizer = almanac.soil_to_fertilizer(soil);
+            let water = almanac.fertilizer_to_water(fertilizer);
+            let light = almanac.water_to_light(water);
+            let temperature = almanac.light_to_temperature(light);
+            let humidity = almanac.temperature_to_humidity(temperature);
+            let location = almanac.humidity_to_location(humidity);
 
-        println!("Seed {seed} => Soil {soil} => Fertilizer {fertilizer} => Water {water} => Light {light} => Temperature {temperature} => Humidity {humidity} => Location {location}");
+            // println!("Seed {seed} => Soil {soil} => Fertilizer {fertilizer} => Water {water} => Light {light} => Temperature {temperature} => Humidity {humidity} => Location {location}");
 
-        location
-    }).min().unwrap()
+            location
+        })
+        .min()
+        .unwrap()
 }
 
 #[cfg(test)]
@@ -71,6 +76,6 @@ humidity-to-location map:
     fn input1() {
         let input = include_str!("../../inputs/input1.txt");
         let output = process(input);
-        assert_eq!(output, 24542);
+        assert_eq!(output, 1181555926);
     }
 }
