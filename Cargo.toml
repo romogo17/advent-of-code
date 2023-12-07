@@ -8,3 +8,5 @@ unsafe_code = "forbid"
 [workspace.dependencies]
 indicatif = { version = "0.17.7", features = ["rayon"] }
 rayon = "1.8.0"
+nom = "7.1.3"
+nom-supreme = "0.8.0"
