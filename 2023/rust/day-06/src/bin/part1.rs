@@ -14,16 +14,16 @@ fn main() {
     println!("Output is {output}");
 }
 
-fn process(input: &str) -> u32 {
+fn process(input: &str) -> u64 {
     let boat_races = parse(input);
     boat_races.iter().map(|br| br.naive_ways_to_win()).product()
 }
 
-fn parse_line(input: &str) -> IResult<&str, Vec<u32>> {
+fn parse_line(input: &str) -> IResult<&str, Vec<u64>> {
     let (input, vals) = take_until(":")
         .precedes(tag(":"))
         .precedes(space1)
-        .precedes(separated_list1(space1, complete::u32))
+        .precedes(separated_list1(space1, complete::u64))
         .parse(input)?;
 
     Ok((input, vals))
@@ -36,7 +36,7 @@ fn parse(input: &str) -> Vec<BoatRace> {
             let (_, v) = parse_line(line).expect("a valid line");
             v
         })
-        .collect::<Vec<Vec<u32>>>();
+        .collect::<Vec<Vec<u64>>>();
 
     parsed[0]
         .iter()
