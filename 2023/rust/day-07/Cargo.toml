@@ -8,7 +8,6 @@ authors = ["Rob Mora <romogo17@gmail.com>"]
 
 [dependencies]
 nom = { workspace = true }
-nom-supreme = { workspace = true }
 
 [lints]
 workspace = true

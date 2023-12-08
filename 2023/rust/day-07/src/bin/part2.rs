@@ -143,7 +143,7 @@ fn parse_line(input: &str) -> IResult<&str, (&str, u64)> {
 }
 
 #[cfg(test)]
-mod day_07_part1 {
+mod day_07_part2 {
     use super::*;
 
     #[test]
