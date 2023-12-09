@@ -137,7 +137,7 @@ mod day_08_part2 {
     use super::*;
 
     #[test]
-    fn example1() {
+    fn example() {
         let input = "LR
 
 11A = (11B, XXX)
