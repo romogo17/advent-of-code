@@ -124,10 +124,10 @@ ZZZ = (ZZZ, ZZZ)";
         assert_eq!(output, 6);
     }
 
-    // #[test]
-    // fn input1() {
-    //     let input = include_str!("../../inputs/input1.txt");
-    //     let output = process(input);
-    //     assert_eq!(output, 246912307);
-    // }
+    #[test]
+    fn input1() {
+        let input = include_str!("../../inputs/input1.txt");
+        let output = process(input);
+        assert_eq!(output, 22357);
+    }
 }
