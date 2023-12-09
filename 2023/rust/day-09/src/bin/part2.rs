@@ -18,7 +18,7 @@ fn process(input: &str) -> i64 {
     let (_, mut readings) = parse_input(input).expect("a valid parse");
     readings
         .iter_mut()
-        .map(|r| r.interpolate_next())
+        .map(|r| r.interpolate_prev())
         .sum::<i64>()
 }
 
@@ -30,7 +30,7 @@ fn parse_input(input: &str) -> IResult<&str, Vec<Reading>> {
 }
 
 #[cfg(test)]
-mod day_09_part1 {
+mod day_09_part2 {
     use super::*;
 
     #[test]
@@ -39,13 +39,13 @@ mod day_09_part1 {
 1 3 6 10 15 21
 10 13 16 21 30 45";
         let output = process(input);
-        assert_eq!(output, 114);
+        assert_eq!(output, 2);
     }
 
     #[test]
     fn input1() {
         let input = include_str!("../../inputs/input1.txt");
         let output = process(input);
-        assert_eq!(output, 1637452029);
+        assert_eq!(output, 908);
     }
 }
