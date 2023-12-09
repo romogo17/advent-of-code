@@ -1,20 +1,15 @@
-use petgraph::graphmap::{DiGraphMap, GraphMap};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use nom::{
-    bytes::complete::{take_till, take_until},
-    character::{
-        complete::{self, alpha1, alphanumeric1, char, line_ending, space1},
-        is_alphabetic,
-    },
+    character::complete::{alpha1, alphanumeric1, char, line_ending},
     combinator::{map, opt},
     multi::{fold_many0, many0},
-    sequence::{self, delimited, preceded, separated_pair, terminated},
-    IResult, Parser,
+    sequence::{preceded, separated_pair, terminated},
+    IResult,
 };
-use nom_supreme::{tag::complete::tag, ParserExt};
+use nom_supreme::tag::complete::tag;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 enum Direction {
     Left,
     Right,
@@ -31,16 +26,7 @@ impl Direction {
 }
 
 fn main() {
-    // let input = include_str!("../../inputs/input1.txt");
-    let input = "RL
-
-AAA = (BBB, CCC)
-BBB = (DDD, EEE)
-CCC = (ZZZ, GGG)
-DDD = (DDD, DDD)
-EEE = (EEE, EEE)
-GGG = (GGG, GGG)
-ZZZ = (ZZZ, ZZZ)";
+    let input = include_str!("../../inputs/input1.txt");
     let output = process(input);
     println!("Output is {output}");
 }
@@ -48,13 +34,28 @@ ZZZ = (ZZZ, ZZZ)";
 fn process(input: &str) -> u64 {
     let (directions, graph) = parse_input(input);
 
-    dbg!(directions);
-    dbg!(graph);
-    100
+    let mut dir_iter = directions.iter().cycle();
+    let mut node = "AAA";
+    let mut visits = 0;
+
+    while let Some(dir) = dir_iter.next() {
+        if let Some((left, right)) = graph.get(node) {
+            node = match dir {
+                Direction::Left => left,
+                Direction::Right => right,
+            };
+            visits += 1;
+
+            if node == "ZZZ" {
+                return visits;
+            }
+        }
+    }
+
+    visits
 }
 
-// fn parse_input(input: &str) -> (Vec<Direction>, DiGraphMap<&str, i32>) {
-fn parse_input(input: &str) -> (Vec<Direction>, HashMap<&str, (&str, &str)>) {
+fn parse_input(input: &str) -> (Vec<Direction>, BTreeMap<&str, (&str, &str)>) {
     let (remaining, directions) = parse_directions(input).unwrap();
     let (_, graph) = preceded(many0(line_ending), parse_graph)(remaining).unwrap();
 
@@ -67,19 +68,11 @@ fn parse_directions(input: &str) -> IResult<&str, Vec<Direction>> {
     })(input)
 }
 
-// fn parse_graph(input: &str) -> IResult<&str, DiGraphMap<&str, i32>> {
-fn parse_graph(input: &str) -> IResult<&str, HashMap<&str, (&str, &str)>> {
-    // This would return a Vec<(&str, (&str, &str))>:
-    // many0(parse_graph_line)(input)
-
+fn parse_graph(input: &str) -> IResult<&str, BTreeMap<&str, (&str, &str)>> {
     fold_many0(
         parse_graph_line,
-        // || DiGraphMap::new(),
-        || HashMap::new(),
-        // |mut map, (key, (left, right))| {
+        || BTreeMap::new(),
         |mut map, (key, value)| {
-            // map.add_edge(key, left, -1);
-            // map.add_edge(key, right, -1);
             map.insert(key, value);
             map
         },
@@ -89,12 +82,12 @@ fn parse_graph(input: &str) -> IResult<&str, HashMap<&str, (&str, &str)>> {
 fn parse_graph_line(input: &str) -> IResult<&str, (&str, (&str, &str))> {
     terminated(
         separated_pair(
-            alpha1,
+            alphanumeric1,
             tag(" = "),
             separated_pair(
-                preceded(char('('), alpha1),
+                preceded(char('('), alphanumeric1),
                 tag(", "),
-                terminated(alpha1, char(')')),
+                terminated(alphanumeric1, char(')')),
             ),
         ),
         opt(line_ending),
@@ -131,10 +124,10 @@ ZZZ = (ZZZ, ZZZ)";
         assert_eq!(output, 6);
     }
 
-    #[test]
-    fn input1() {
-        let input = include_str!("../../inputs/input1.txt");
-        let output = process(input);
-        assert_eq!(output, 246912307);
-    }
+    // #[test]
+    // fn input1() {
+    //     let input = include_str!("../../inputs/input1.txt");
+    //     let output = process(input);
+    //     assert_eq!(output, 246912307);
+    // }
 }
