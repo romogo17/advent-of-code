@@ -1,173 +1,11 @@
-// use day_10::*;
-
-use std::collections::HashMap;
+use day_10::*;
 
 use glam::IVec2;
 use nom::{
     branch::alt, bytes::complete::tag, character::complete::multispace0, combinator::all_consuming,
     multi::many1, sequence::terminated, IResult, Parser,
 };
-use nom_locate::LocatedSpan;
-
-#[derive(Debug, Eq, PartialEq)]
-enum PipeType {
-    Vertical,
-    Horizontal,
-    NorthEast,
-    NorthWest,
-    SouthEast,
-    SouthWest,
-    Start,
-    Ground,
-}
-
-impl PipeType {
-    fn is_pipe_connection_valid(&self, other: &PipeType, direction: &Direction) -> bool {
-        match (self, direction) {
-            (PipeType::Vertical, Direction::North) => match other {
-                PipeType::Vertical => true,
-                PipeType::SouthEast => true,
-                PipeType::SouthWest => true,
-                PipeType::Start => true,
-                _ => false,
-            },
-
-            (PipeType::Vertical, Direction::South) => match other {
-                PipeType::Vertical => true,
-                PipeType::NorthEast => true,
-                PipeType::NorthWest => true,
-                PipeType::Start => true,
-                _ => false,
-            },
-
-            (PipeType::Horizontal, Direction::West) => match other {
-                PipeType::Horizontal => true,
-                PipeType::NorthEast => true,
-                PipeType::SouthEast => true,
-                PipeType::Start => true,
-                _ => false,
-            },
-
-            (PipeType::Horizontal, Direction::East) => match other {
-                PipeType::Horizontal => true,
-                PipeType::NorthWest => true,
-                PipeType::SouthWest => true,
-                PipeType::Start => true,
-                _ => false,
-            },
-
-            (PipeType::NorthEast, Direction::North) => match other {
-                PipeType::Vertical => true,
-                PipeType::SouthEast => true,
-                PipeType::SouthWest => true,
-                PipeType::Start => true,
-                _ => false,
-            },
-
-            (PipeType::NorthEast, Direction::East) => match other {
-                PipeType::Horizontal => true,
-                PipeType::NorthWest => true,
-                PipeType::SouthWest => true,
-                PipeType::Start => true,
-                _ => false,
-            },
-
-            (PipeType::NorthWest, Direction::North) => match other {
-                PipeType::Vertical => true,
-                PipeType::SouthEast => true,
-                PipeType::SouthWest => true,
-                PipeType::Start => true,
-                _ => false,
-            },
-
-            (PipeType::NorthWest, Direction::West) => match other {
-                PipeType::Horizontal => true,
-                PipeType::NorthEast => true,
-                PipeType::SouthEast => true,
-                PipeType::Start => true,
-                _ => false,
-            },
-
-            (PipeType::SouthEast, Direction::South) => match other {
-                PipeType::Vertical => true,
-                PipeType::NorthEast => true,
-                PipeType::NorthWest => true,
-                PipeType::Start => true,
-                _ => false,
-            },
-
-            (PipeType::SouthEast, Direction::East) => match other {
-                PipeType::Horizontal => true,
-                PipeType::NorthWest => true,
-                PipeType::SouthWest => true,
-                PipeType::Start => true,
-                _ => false,
-            },
-
-            (PipeType::SouthWest, Direction::South) => match other {
-                PipeType::Vertical => true,
-                PipeType::NorthEast => true,
-                PipeType::NorthWest => true,
-                PipeType::Start => true,
-                _ => false,
-            },
-
-            (PipeType::SouthWest, Direction::West) => match other {
-                PipeType::Horizontal => true,
-                PipeType::NorthEast => true,
-                PipeType::SouthEast => true,
-                _ => false,
-            },
-
-            (PipeType::Start, Direction::North) => match other {
-                PipeType::Vertical => true,
-                PipeType::SouthEast => true,
-                PipeType::SouthWest => true,
-                _ => false,
-            },
-
-            (PipeType::Start, Direction::South) => match other {
-                PipeType::Vertical => true,
-                PipeType::NorthEast => true,
-                PipeType::NorthWest => true,
-                _ => false,
-            },
-
-            (PipeType::Start, Direction::West) => match other {
-                PipeType::Horizontal => true,
-                PipeType::NorthEast => true,
-                PipeType::SouthEast => true,
-                _ => false,
-            },
-
-            (PipeType::Start, Direction::East) => match other {
-                PipeType::Horizontal => true,
-                PipeType::NorthWest => true,
-                PipeType::SouthWest => true,
-                _ => false,
-            },
-
-            _ => false,
-        }
-    }
-}
-
-#[derive(Debug, Eq, PartialEq)]
-enum Direction {
-    North,
-    South,
-    West,
-    East,
-}
-
-#[derive(Debug)]
-struct PipeInfo<'a> {
-    span: SpanIVec2<'a>,
-    pipe_type: PipeType,
-}
-
-type Span<'a> = LocatedSpan<&'a str>;
-type SpanIVec2<'a> = LocatedSpan<&'a str, IVec2>;
+use std::collections::HashMap;
 
 fn with_xy(span: Span) -> SpanIVec2 {
     // column and location line are 1-indexed
@@ -326,10 +164,10 @@ LJ.LJ";
         assert_eq!(output, 8);
     }
 
-    // #[test]
-    // fn input1() {
-    //     let input = include_str!("../../inputs/input1.txt");
-    //     let output = process(input);
-    //     assert_eq!(output, 0);
-    // }
+    #[test]
+    fn input1() {
+        let input = include_str!("../../inputs/input1.txt");
+        let output = process(input);
+        assert_eq!(output, 6856);
+    }
 }
