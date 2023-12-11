@@ -108,6 +108,7 @@ impl PipeType {
                 PipeType::Horizontal => true,
                 PipeType::NorthEast => true,
                 PipeType::SouthEast => true,
+                PipeType::Start => true,
                 _ => false,
             },
 
@@ -115,6 +116,7 @@ impl PipeType {
                 PipeType::Vertical => true,
                 PipeType::SouthEast => true,
                 PipeType::SouthWest => true,
+                PipeType::Start => true,
                 _ => false,
             },
 
