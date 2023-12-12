@@ -151,10 +151,10 @@ mod day_11_part1 {
         assert_eq!(output, 374);
     }
 
-    // #[test]
-    // fn input1() {
-    //     let input = include_str!("../../inputs/input1.txt");
-    //     let output = process(input);
-    //     assert_eq!(output, 6856);
-    // }
+    #[test]
+    fn input1() {
+        let input = include_str!("../../inputs/input1.txt");
+        let output = process(input);
+        assert_eq!(output, 9769724);
+    }
 }
