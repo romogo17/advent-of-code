@@ -27,6 +27,20 @@ impl SpringsLine {
         Self { conditions }
     }
 
+    pub fn from_string(input: String) -> Self {
+        let conditions: Vec<Condition> = input
+            .chars()
+            .map(|c| match c {
+                '.' => Condition::Operational,
+                '#' => Condition::Damaged,
+                '?' => Condition::Unknown,
+                _ => panic!("invalid condition: {}", c),
+            })
+            .collect();
+
+        Self { conditions }
+    }
+
     pub fn from_missing_permutation(template: &SpringsLine, permutation: &Vec<&Condition>) -> Self {
         let mut permutation_iter = permutation.iter();
         let conditions: Vec<Condition> = template
