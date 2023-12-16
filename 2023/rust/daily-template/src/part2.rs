@@ -2,7 +2,7 @@ use crate::custom_error::AocError;
 
 #[tracing::instrument]
 pub fn process(_input: &str) -> miette::Result<i64, AocError> {
-    todo!("{{project-name}} - part1");
+    todo!("{{project-name}}_part1");
 }
 
 #[cfg(test)]
