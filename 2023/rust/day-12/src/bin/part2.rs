@@ -1,7 +1,5 @@
 use day_12::*;
 
-use rayon::prelude::*;
-
 use itertools::Itertools;
 use nom::{
     bytes::complete::{is_a, tag},
