@@ -1,4 +1,5 @@
 use crate::custom_error::AocError;
+use tracing::debug;
 
 #[tracing::instrument]
 pub fn process(_input: &str) -> miette::Result<u64, AocError> {
