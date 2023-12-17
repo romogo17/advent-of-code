@@ -19,3 +19,6 @@ miette = { version = "5.10.0", features = ["fancy"] }
 thiserror = "1.0.51"
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["fmt", "env-filter"] }
+test-log = { version = "0.2.14", default-features = false, features = [
+    "trace",
+] }

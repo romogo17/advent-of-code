@@ -1,20 +1,28 @@
 use crate::custom_error::AocError;
-use tracing::debug;
+use tracing::{debug, info};
 
 #[tracing::instrument(skip(input))]
-pub fn process(_input: &str) -> miette::Result<u64, AocError> {
-    todo!("{{project-name}}_part1");
+pub fn process(input: &str) -> miette::Result<u64, AocError> {
+    info!("running not implemented {{crate_name}}_part1");
+    debug!(input, "with");
+    Ok(100)
 }
 
 #[cfg(test)]
 mod {{crate_name}}_part1 {
     use super::*;
 
-    #[test]
+    #[test_log::test]
     fn example() -> miette::Result<()> {
-        todo!("haven't built test yet");
         let input = "";
         assert_eq!(100, process(input)?);
         Ok(())
     }
+
+    // #[test_log::test]
+    // fn input1() -> miette::Result<()> {
+    //     let input = include_str!("../inputs/input1.txt");
+    //     assert_eq!(100, process(input)?);
+    //     Ok(())
+    // }
 }
