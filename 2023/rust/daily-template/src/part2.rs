@@ -1,7 +1,7 @@
 use crate::custom_error::AocError;
 use tracing::debug;
 
-#[tracing::instrument]
+#[tracing::instrument(skip(input))]
 pub fn process(_input: &str) -> miette::Result<u64, AocError> {
     todo!("{{project-name}}_part1");
 }
