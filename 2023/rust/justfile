@@ -10,6 +10,9 @@ work day part log_level="debug":
 test day part log_level="info":
     RUST_LOG={{log_level}} cargo nextest run --package {{day}} {{part}}
 
+test-release day part log_level="info":
+    RUST_LOG={{log_level}} cargo nextest run --package {{day}} {{part}} --release
+
 run day part log_level="info":
     RUST_LOG={{log_level}} cargo run --package {{day}} --bin {{part}}
 
