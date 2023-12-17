@@ -22,3 +22,4 @@ tracing-subscriber = { version = "0.3.18", features = ["fmt", "env-filter"] }
 test-log = { version = "0.2.14", default-features = false, features = [
     "trace",
 ] }
+pathfinding = "4.6.0"
