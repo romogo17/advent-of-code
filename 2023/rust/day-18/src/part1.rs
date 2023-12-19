@@ -5,19 +5,17 @@ use glam::I64Vec2;
 use itertools::Itertools;
 use nom::{
     branch::alt,
-    bytes::complete::tag,
-    character::complete::{self, hex_digit1, line_ending, space1},
+    bytes::complete::take_until,
+    character::complete::{self, line_ending, space1},
     multi::separated_list1,
-    sequence::delimited,
+    sequence::{delimited, terminated},
     IResult, Parser,
 };
 
 #[derive(Debug)]
-struct DigInstruction<'a> {
+struct DigInstruction {
     direction: I64Vec2,
     count: i64,
-    #[allow(dead_code)]
-    hex_color: &'a str,
 }
 
 fn dig_instruction(input: &str) -> IResult<&str, DigInstruction> {
@@ -29,17 +27,9 @@ fn dig_instruction(input: &str) -> IResult<&str, DigInstruction> {
     ))(input)?;
 
     let (input, count) = delimited(space1, complete::i64, space1)(input)?;
+    let (input, _) = terminated(take_until(")"), complete::char(')'))(input)?;
 
-    let (input, hex_color) = delimited(tag("(#"), hex_digit1, complete::char(')'))(input)?;
-
-    Ok((
-        input,
-        DigInstruction {
-            direction,
-            count,
-            hex_color,
-        },
-    ))
+    Ok((input, DigInstruction { direction, count }))
 }
 
 fn parse_dig_plan(input: &str) -> IResult<&str, Vec<DigInstruction>> {
