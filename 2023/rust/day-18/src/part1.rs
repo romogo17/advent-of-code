@@ -22,8 +22,8 @@ fn dig_instruction(input: &str) -> IResult<&str, DigInstruction> {
     let (input, direction) = alt((
         complete::char('R').map(|_| I64Vec2::X),
         complete::char('L').map(|_| I64Vec2::NEG_X),
-        complete::char('U').map(|_| I64Vec2::NEG_Y),
-        complete::char('D').map(|_| I64Vec2::Y),
+        complete::char('U').map(|_| I64Vec2::Y),
+        complete::char('D').map(|_| I64Vec2::NEG_Y),
     ))(input)?;
 
     let (input, count) = delimited(space1, complete::i64, space1)(input)?;
@@ -65,14 +65,14 @@ pub fn process(input: &str) -> miette::Result<u64, AocError> {
         };
     debug!(?perimeter_len);
 
-    let area = ((vertices
+    let area = (vertices
         .iter()
         .tuple_windows()
         .map(|(a, b)| a.x * b.y - a.y * b.x)
         .sum::<i64>()
-        + perimeter_len)
         / 2)
     .abs()
+        + perimeter_len / 2
         + 1;
 
     info!(?area);

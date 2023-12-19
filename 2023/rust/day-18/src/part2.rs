@@ -25,9 +25,9 @@ fn dig_instruction(input: &str) -> IResult<&str, DigInstruction> {
     let count = i64::from_str_radix(hex, 16).expect("a valid hex number");
     let direction = match i64::from_str_radix(direction, 16).expect("a valid hex number") {
         0 => I64Vec2::X,
-        1 => I64Vec2::Y,
+        1 => I64Vec2::NEG_Y,
         2 => I64Vec2::NEG_X,
-        3 => I64Vec2::NEG_Y,
+        3 => I64Vec2::Y,
         _ => panic!("invalid direction"),
     };
 
@@ -67,14 +67,14 @@ pub fn process(input: &str) -> miette::Result<u64, AocError> {
         };
     debug!(?perimeter_len);
 
-    let area = ((vertices
+    let area = (vertices
         .iter()
         .tuple_windows()
         .map(|(a, b)| a.x * b.y - a.y * b.x)
         .sum::<i64>()
-        + perimeter_len)
         / 2)
     .abs()
+        + perimeter_len / 2
         + 1;
 
     info!(?area);
