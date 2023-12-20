@@ -1,18 +1,15 @@
 use crate::custom_error::AocError;
 
-use itertools::iproduct;
 use nom::{
     branch::alt,
     bytes::complete::tag,
     character::complete::{self, alpha1, line_ending, multispace1},
-    combinator::opt,
-    multi::{fold_many1, separated_list1},
-    sequence::{delimited, separated_pair, terminated},
+    multi::separated_list1,
+    sequence::delimited,
     IResult, Parser,
 };
-use std::collections::{HashMap, HashSet};
 use std::{cmp::Ordering, ops::RangeInclusive};
-use tracing::{debug, info, warn};
+use std::{collections::HashMap, hash::Hash};
 
 // The puzzle uses only less than and greater than. Otherwise we would use Ordering
 #[derive(Debug, PartialEq, Eq)]
@@ -39,8 +36,17 @@ enum Rule<'a> {
     Target(Target<'a>),
 }
 
+enum Apply<'a> {
+    Split {
+        pass: (Part, &'a Target<'a>),
+        fails: Part,
+    },
+    PassedTest(&'a Target<'a>),
+    FailedTest,
+}
+
 impl<'a> Rule<'a> {
-    fn next_target(&self, part: &Part) -> Option<&Target> {
+    fn apply_to(&self, part: &Part) -> Apply {
         match self {
             Rule::Test {
                 attribute,
@@ -49,19 +55,63 @@ impl<'a> Rule<'a> {
                 target,
             } => {
                 let attribute_value = match *attribute {
-                    "x" => part.x,
-                    "m" => part.m,
-                    "a" => part.a,
-                    "s" => part.s,
-                    _ => panic!("unknown attribute {}", attribute),
+                    "x" => &part.x,
+                    "m" => &part.m,
+                    "a" => &part.a,
+                    "s" => &part.s,
+                    _ => unreachable!("unknown attribute {}", attribute),
                 };
                 let ordering = match condition {
                     Condition::LessThan => Ordering::Less,
                     Condition::GreaterThan => Ordering::Greater,
                 };
-                (attribute_value.cmp(value) == ordering).then_some(target)
+
+                if attribute_value.contains(value) {
+                    // split range
+                    match condition {
+                        Condition::LessThan => {
+                            let new_range_low = *attribute_value.start()..=(value - 1);
+                            let mut part_low = part.clone();
+                            part_low.set_attr(attribute, new_range_low);
+
+                            let new_range_high = *value..=*attribute_value.end();
+                            let mut part_high = part.clone();
+                            part_high.set_attr(attribute, new_range_high);
+
+                            Apply::Split {
+                                pass: (part_low, target),
+                                fails: part_high,
+                            }
+                        }
+
+                        Condition::GreaterThan => {
+                            let new_range_low = *attribute_value.start()..=*value;
+                            let mut part_low = part.clone();
+                            part_low.set_attr(attribute, new_range_low);
+
+                            let new_range_high = (*value + 1)..=*attribute_value.end();
+                            let mut part_high = part.clone();
+                            part_high.set_attr(attribute, new_range_high);
+
+                            Apply::Split {
+                                pass: (part_high, target),
+                                fails: part_low,
+                            }
+                        }
+                    }
+                } else {
+                    // only do one target
+                    if (attribute_value.end() < value && ordering == Ordering::Less)
+                        || (attribute_value.start() > value && ordering == Ordering::Greater)
+                    {
+                        // entire range satisfies the condition
+                        Apply::PassedTest(target)
+                    } else {
+                        Apply::FailedTest
+                    }
+                }
             }
-            Rule::Target(target) => Some(target),
+            Rule::Target(target) => Apply::PassedTest(target),
         }
     }
 }
@@ -72,40 +122,33 @@ struct Workflow<'a> {
     rules: Vec<Rule<'a>>,
 }
 
-#[derive(Debug, PartialEq, Eq, Default)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 struct Part {
-    x: u64,
-    m: u64,
-    a: u64,
-    s: u64,
+    x: RangeInclusive<u64>,
+    m: RangeInclusive<u64>,
+    a: RangeInclusive<u64>,
+    s: RangeInclusive<u64>,
 }
 
 impl Part {
-    fn is_accepted(&self, workflows: &HashMap<&str, Workflow>) -> bool {
-        let mut workflow_id = "in";
-        let last_target: Target = 'workflow_loop: loop {
-            let workflow = workflows.get(workflow_id).expect("should have a workflow");
+    fn set_attr(&mut self, attr: &str, new_range: RangeInclusive<u64>) {
+        match attr {
+            "x" => self.x = new_range,
+            "m" => self.m = new_range,
+            "a" => self.a = new_range,
+            "s" => self.s = new_range,
+            _ => unreachable!("unknown attribute {}", attr),
+        }
+    }
+}
 
-            'rule_loop: for rule in workflow.rules.iter() {
-                match rule.next_target(self) {
-                    Some(Target::Accepted) => {
-                        break 'workflow_loop Target::Accepted;
-                    }
-                    Some(Target::Rejected) => {
-                        break 'workflow_loop Target::Rejected;
-                    }
-                    Some(Target::Workflow(next_workflow_id)) => {
-                        workflow_id = next_workflow_id;
-                        break 'rule_loop;
-                    }
-                    None => {}
-                }
-            }
-        };
-        match last_target {
-            Target::Workflow(_) => panic!("should not have a workflow as last target"),
-            Target::Accepted => true,
-            Target::Rejected => false,
+impl Default for Part {
+    fn default() -> Self {
+        Self {
+            x: 1..=4000,
+            m: 1..=4000,
+            a: 1..=4000,
+            s: 1..=4000,
         }
     }
 }
@@ -156,130 +199,53 @@ fn workflows(input: &str) -> IResult<&str, HashMap<&str, Workflow>> {
     Ok((input, workflows.into_iter().map(|w| (w.id, w)).collect()))
 }
 
-fn part(input: &str) -> IResult<&str, Part> {
-    delimited(
-        complete::char('{'),
-        fold_many1(
-            terminated(
-                separated_pair(alpha1, complete::char('='), complete::u64),
-                opt(tag(",")),
-            ),
-            Part::default,
-            |mut part, (next_attribute, count)| {
-                match next_attribute {
-                    "x" => part.x = count,
-                    "m" => part.m = count,
-                    "a" => part.a = count,
-                    "s" => part.s = count,
-                    _ => panic!("unknown attribute {}", next_attribute),
-                }
-                part
-            },
-        ),
-        complete::char('}'),
-    )(input)
-}
-
-fn parts(input: &str) -> IResult<&str, Vec<Part>> {
-    separated_list1(line_ending, part)(input)
-}
-
-fn parse(input: &str) -> IResult<&str, (Vec<Part>, HashMap<&str, Workflow>)> {
+fn parse(input: &str) -> IResult<&str, HashMap<&str, Workflow>> {
     let (input, workflows) = workflows(input)?;
     let (input, _) = multispace1(input)?;
-    let (input, parts) = parts(input)?;
-    Ok((input, (parts, workflows)))
+    Ok((input, workflows))
 }
 
-fn compute_ranges<'a>(
-    workflows: &HashMap<&str, Workflow<'a>>,
-) -> HashMap<&'a str, HashSet<RangeInclusive<u64>>> {
-    let mut range_sets: HashMap<&'a str, HashSet<RangeInclusive<u64>>> = HashMap::from([
-        ("a", HashSet::from([RangeInclusive::new(1, 4000)])),
-        ("m", HashSet::from([RangeInclusive::new(1, 4000)])),
-        ("s", HashSet::from([RangeInclusive::new(1, 4000)])),
-        ("x", HashSet::from([RangeInclusive::new(1, 4000)])),
-    ]);
+fn process_part(part: Part, workflows: &HashMap<&str, Workflow>, next_target: &Target) -> u64 {
+    match next_target {
+        Target::Workflow(id) => {
+            let current_workflow = workflows
+                .get(id)
+                .expect("should always return a valid workflow for a valid id");
+            let mut current_part = part;
+            let mut sum = 0;
 
-    for (_id, workflow) in workflows.iter() {
-        for rule in workflow.rules.iter() {
-            match rule {
-                Rule::Test {
-                    attribute,
-                    condition,
-                    value,
-                    target: _,
-                } => {
-                    let range_set = range_sets.get_mut(attribute).expect("should have a range");
-                    let mut new_range_set: HashSet<RangeInclusive<u64>> = HashSet::new();
-
-                    for range in range_set.iter() {
-                        match condition {
-                            // attr < value
-                            Condition::LessThan => {
-                                if range.contains(value) {
-                                    new_range_set.insert(range.start().clone()..=*value - 1);
-                                    new_range_set.insert(*value..=*range.end());
-                                } else {
-                                    new_range_set.insert(range.clone());
-                                }
-                            }
-                            // attr > value
-                            Condition::GreaterThan => {
-                                if range.contains(value) {
-                                    new_range_set.insert(range.start().clone()..=*value);
-                                    new_range_set.insert(*value + 1..=*range.end());
-                                } else {
-                                    new_range_set.insert(range.clone());
-                                }
-                            }
-                        }
+            for rule in current_workflow.rules.iter() {
+                match rule.apply_to(&current_part) {
+                    Apply::Split { pass, fails } => {
+                        sum += process_part(pass.0, workflows, pass.1);
+                        current_part = fails;
                     }
-
-                    *range_set = new_range_set;
+                    Apply::PassedTest(target) => {
+                        sum += process_part(current_part.clone(), workflows, target);
+                        break;
+                    }
+                    Apply::FailedTest => {}
                 }
-                Rule::Target(_) => {}
             }
+            sum
         }
+        Target::Accepted => {
+            (part.x.end() - part.x.start() + 1)
+                * (part.m.end() - part.m.start() + 1)
+                * (part.a.end() - part.a.start() + 1)
+                * (part.s.end() - part.s.start() + 1)
+        }
+        Target::Rejected => 0,
     }
-
-    range_sets
 }
 
 #[tracing::instrument(skip(input))]
 pub fn process(input: &str) -> miette::Result<u64, AocError> {
-    let (_input, (_parts, workflows)) = parse(input).expect("should parse the puzzle input");
+    let (_input, workflows) = parse(input).expect("should parse the puzzle input");
 
-    let range_sets = compute_ranges(&workflows);
-    debug!(?range_sets, "range sets");
+    let result = process_part(Part::default(), &workflows, &Target::Workflow("in"));
 
-    let mut sum = 0u64;
-    iproduct!(
-        range_sets.get("x").expect("should have a range"),
-        range_sets.get("m").expect("should have a range"),
-        range_sets.get("a").expect("should have a range"),
-        range_sets.get("s").expect("should have a range")
-    )
-    .for_each(|(x, m, a, s)| {
-        debug!(?x, ?m, ?a, ?s, "checking parts with attributes in");
-        let sample_part = Part {
-            x: x.start().clone(),
-            m: m.start().clone(),
-            a: a.start().clone(),
-            s: s.start().clone(),
-        };
-        match sample_part.is_accepted(&workflows) {
-            true => {
-                // info!(?x, ?m, ?a, ?s, "found a part that is accepted");
-                sum +=
-                    (x.clone().count() * m.clone().count() * a.clone().count() * s.clone().count())
-                        as u64;
-            }
-            false => {}
-        }
-    });
-
-    Ok(sum)
+    Ok(result)
 }
 
 #[cfg(test)]
@@ -335,10 +301,10 @@ hdj{m>838:A,pv}
         Ok(())
     }
 
-    // #[test_log::test]
-    // fn input1() -> miette::Result<()> {
-    //     let input = include_str!("../inputs/input1.txt");
-    //     assert_eq!(100, process(input)?);
-    //     Ok(())
-    // }
+    #[test_log::test]
+    fn input1() -> miette::Result<()> {
+        let input = include_str!("../inputs/input1.txt");
+        assert_eq!(143219569011526, process(input)?);
+        Ok(())
+    }
 }
