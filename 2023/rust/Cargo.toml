@@ -23,3 +23,4 @@ test-log = { version = "0.2.14", default-features = false, features = [
     "trace",
 ] }
 pathfinding = "4.6.0"
+rstest = "0.18.2"
