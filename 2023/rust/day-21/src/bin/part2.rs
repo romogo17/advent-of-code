@@ -12,7 +12,7 @@ fn main() -> miette::Result<()> {
         .init();
 
     let input = include_str!("../../inputs/input1.txt");
-    let output = process(input).context("process part 2")?;
+    let output = process(input, 26501365).context("process part 2")?;
     println!("Output is {output}");
     Ok(())
 }
