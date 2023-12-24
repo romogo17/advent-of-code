@@ -23,6 +23,8 @@ impl Hailstone {
     fn at_xy(&self, scalar: f64) -> DVec2 {
         self.starting_position.as_dvec3().xy() + scalar * self.direction.as_dvec3().xy()
     }
+
+    // https://math.stackexchange.com/questions/406864/intersection-of-two-lines-in-vector-form
     fn solve_intersection_xy(&self, other: &Hailstone) -> Result<(f64, f64, DVec2), LinalgError> {
         use ndarray::prelude::*;
         use ndarray_linalg::Solve;
