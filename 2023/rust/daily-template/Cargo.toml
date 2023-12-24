@@ -13,8 +13,6 @@ nom = { workspace = true }
 nom-supreme = { workspace = true }
 nom_locate = { workspace = true }
 glam = { workspace = true }
-ndarray = { workspace = true }
-ndarray-linalg = { workspace = true }
 petgraph = { workspace = true }
 itertools = { workspace = true }
 sha2 = { workspace = true }
