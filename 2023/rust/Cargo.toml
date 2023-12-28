@@ -3,7 +3,7 @@ resolver = "2"
 members = ["day-*"]
 
 [workspace.lints.rust]
-unsafe_code = "forbid"
+unsafe_code = "warn"
 
 [workspace.dependencies]
 indicatif = { version = "0.17.7", features = ["rayon"] }
@@ -27,3 +27,4 @@ test-log = { version = "0.2.14", default-features = false, features = [
 ] }
 pathfinding = "4.6.0"
 rstest = "0.18.2"
+num = "0.4.1"
