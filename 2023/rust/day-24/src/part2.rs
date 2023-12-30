@@ -1,5 +1,6 @@
 use crate::custom_error::AocError;
 use ndarray::prelude::*;
+use ndarray_linalg::Inverse;
 use nom::{
     bytes::complete::tag,
     character::complete::{self, line_ending, space1},
@@ -7,10 +8,7 @@ use nom::{
     sequence::{delimited, separated_pair, terminated},
     IResult, Parser,
 };
-// use num::FromPrimitive;
 use tracing::debug;
-
-// type CordType = num::rational::Ratio<i128>;
 
 #[derive(Debug)]
 struct DHailstone {
@@ -70,10 +68,6 @@ fn cross_matrix(v: &Array1<f64>) -> Array2<f64> {
 pub fn process(input: &str) -> miette::Result<u64, AocError> {
     let (_, hailstones) = parse_hailstones(input).expect("should parse hailstones");
 
-    debug!("{:?}", hailstones[0]);
-    debug!("{:?}", hailstones[1]);
-    debug!("{:?}", hailstones[2]);
-
     let mut a: Array2<f64> = Array::zeros((6, 6));
     let mut b: Array1<f64> = Array::zeros(6);
 
@@ -85,7 +79,7 @@ pub fn process(input: &str) -> miette::Result<u64, AocError> {
         &(-cross(&hailstones[0].starting_position, &hailstones[0].direction)
             + cross(&hailstones[2].starting_position, &hailstones[2].direction)),
     );
-    debug!("{:?}", b);
+    debug!(?b);
 
     a.slice_mut(s![0..3, 0..3])
         .assign(&(cross_matrix(&hailstones[0].direction) - cross_matrix(&hailstones[1].direction)));
@@ -99,9 +93,11 @@ pub fn process(input: &str) -> miette::Result<u64, AocError> {
         &(-cross_matrix(&hailstones[0].starting_position)
             + cross_matrix(&hailstones[2].starting_position)),
     );
-    debug!("{:?}", a);
-
+    debug!(?a);
+    
     let a_inv = a.inv().unwrap();
+    debug!(?a_inv);
+
     let result = a_inv.dot(&b);
     debug!("{:?}", result);
 
