@@ -13,7 +13,7 @@ mod {{crate_name}}_part2 {
     #[test_log::test]
     fn example() -> miette::Result<()> {
         let input = "";
-        assert_eq!("", process(input)?);
+        assert_eq!(100, process(input)?);
         Ok(())
     }
 
