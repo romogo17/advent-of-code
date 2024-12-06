@@ -1,8 +1,8 @@
-use crate::custom_error::AocError;
+use miette::miette;
 use tracing::{debug};
 
 #[tracing::instrument(skip(input))]
-pub fn process(input: &str) -> miette::Result<u64, AocError> {
+pub fn process(input: &str) -> miette::Result<u32> {
     debug!(?input);
     todo!("not implemented {{crate_name}}_part1");
 }
