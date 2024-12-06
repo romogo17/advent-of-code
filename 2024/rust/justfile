@@ -4,24 +4,16 @@ create day:
     just get-input {{day}}
 
 # Work on a day's puzzle part
-work day part log_level="debug":
-    cargo watch -w {{day}} -x "check --package {{day}}" -s "just test {{day}} {{part}} {{log_level}}"
+work day part:
+    cargo watch -w {{day}} -x "check --package {{day}}" -s "just test {{day}} {{part}}"
 
 # Run tests for a day's puzzle part
-test day part log_level="info":
-    RUST_LOG={{log_level}} cargo nextest run --package {{day}} {{part}}
-
-# Run tests for a day's puzzle part in release mode
-test-release day part log_level="info":
-    RUST_LOG={{log_level}} cargo nextest run --package {{day}} {{part}} --release
+test day part *FLAGS:
+    cargo nextest run --package {{day}} {{part}} {{FLAGS}}
 
 # Run a day's puzzle part
-run day part log_level="info":
-    RUST_LOG={{log_level}} cargo run --package {{day}} --bin {{part}}
-
-# Run a day's puzzle part in release mode
-run-release day part log_level="info":
-    RUST_LOG={{log_level}} cargo run --package {{day}} --bin {{part}} --release
+run day part *FLAGS:
+    cargo run --package {{day}} --bin {{part}} {{FLAGS}}
 
 # You can find SESSION by using Chrome tools:
 # 1) Go to https://adventofcode.com/2024/day/1/input
