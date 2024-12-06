@@ -1,15 +1,10 @@
 use {{crate_name}}::part1::process;
 
 use miette::Context;
-use tracing_subscriber::prelude::*;
-use tracing_subscriber::EnvFilter;
 
 #[tracing::instrument]
 fn main() -> miette::Result<()> {
-    tracing_subscriber::registry()
-        .with(EnvFilter::from_default_env())
-        .with(tracing_subscriber::fmt::layer().compact())
-        .init();
+    tracing_subscriber::fmt::init();
 
     let input = include_str!("../../inputs/input.txt");
     let output = process(input).context("process part 1")?;
