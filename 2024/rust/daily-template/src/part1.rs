@@ -1,9 +1,17 @@
 use miette::miette;
-use tracing::{debug};
+use nom::IResult;
+use tracing::debug;
+
+fn parse(input: &str) -> IResult<&str, ()> {
+    debug!(?input);
+
+    todo!("not implemented {{crate_name}}_part1 parsing");
+}
 
 #[tracing::instrument(skip(input))]
 pub fn process(input: &str) -> miette::Result<u32> {
-    debug!(?input);
+    let (_input, data) = parse(input).map_err(|e| miette!("parse failed {}", e))?;
+    debug!(?data);
     todo!("not implemented {{crate_name}}_part1");
 }
 
