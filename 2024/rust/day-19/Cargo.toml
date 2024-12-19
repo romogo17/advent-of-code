@@ -1,0 +1,30 @@
+[package]
+name = "day-19"
+version = "0.1.0"
+edition = "2021"
+authors = ["Rob Mora <romogo17@gmail.com>"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+indicatif = { workspace = true }
+rayon = { workspace = true }
+nom = { workspace = true }
+nom-supreme = { workspace = true }
+nom_locate = { workspace = true }
+glam = { workspace = true }
+petgraph = { workspace = true }
+itertools = { workspace = true }
+sha2 = { workspace = true }
+miette = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+cached = { workspace = true }
+
+[dev-dependencies]
+test-log = { workspace = true }
+rstest = { workspace = true }
+
+[lints]
+workspace = true

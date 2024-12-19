@@ -30,3 +30,4 @@ test-log = { version = "0.2.16", default-features = false, features = [
 pathfinding = "4.11.0"
 rstest = "0.23.0"
 num = "0.4.3"
+cached = "0.54.0"
