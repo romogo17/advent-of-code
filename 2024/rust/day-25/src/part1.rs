@@ -9,7 +9,6 @@ use nom::{
     sequence::{preceded, terminated, tuple},
     IResult,
 };
-use tracing::debug;
 
 #[derive(Debug, PartialEq, Eq)]
 enum DeviceType {
